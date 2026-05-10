@@ -162,6 +162,85 @@ async def run_full_scan(db: Session) -> ScannerPayload:
     return payload
 
 
+def compact_scan_payload(payload: dict) -> dict:
+    nifty_options = payload.get("nifty_options") or {}
+    banknifty_options = payload.get("banknifty_options") or {}
+    bias = payload.get("bias") or {}
+    breadth = payload.get("breadth") or {}
+
+    return {
+        "bias": {
+            "market_bias": bias.get("market_bias"),
+            "bias_score": bias.get("bias_score"),
+            "confidence": bias.get("confidence"),
+            "action": bias.get("action"),
+            "summary": bias.get("summary"),
+            "warnings": bias.get("warnings") or [],
+        },
+        "indices": {
+            "nifty": _compact_quote(payload.get("nifty") or {}),
+            "banknifty": _compact_quote(payload.get("banknifty") or {}),
+        },
+        "breadth": {
+            "advance_pct": breadth.get("advance_pct"),
+            "advancing": breadth.get("advancing"),
+            "declining": breadth.get("declining"),
+            "total": breadth.get("total"),
+        },
+        "options": {
+            "nifty": _compact_options(nifty_options),
+            "banknifty": _compact_options(banknifty_options),
+        },
+        "setups": [
+            {
+                "symbol": s.get("symbol"),
+                "direction": s.get("direction"),
+                "setup_type": s.get("setup_type"),
+                "entry": s.get("entry"),
+                "stop_loss": s.get("stop_loss"),
+                "target_1": s.get("target_1"),
+                "target_2": s.get("target_2"),
+                "risk_reward": s.get("risk_reward"),
+                "confidence": s.get("confidence"),
+                "decision": s.get("decision"),
+                "reason": s.get("reason") or [],
+            }
+            for s in (payload.get("setups") or [])
+        ],
+    }
+
+
+def _compact_quote(quote: dict) -> dict:
+    vwap = quote.get("vwap")
+    ltp = quote.get("ltp")
+    return {
+        "symbol": quote.get("symbol"),
+        "ltp": ltp,
+        "open": quote.get("open"),
+        "high": quote.get("high"),
+        "low": quote.get("low"),
+        "close": quote.get("close"),
+        "vwap": vwap if vwap is not None else ltp,
+        "vwap_source": "provider" if vwap is not None else "ltp_fallback",
+    }
+
+
+def _compact_options(options: dict) -> dict:
+    return {
+        "expiry": options.get("expiry"),
+        "spot_price": options.get("spot_price"),
+        "atm_strike": options.get("atm_strike"),
+        "pcr": options.get("pcr"),
+        "max_pain": options.get("max_pain"),
+        "support_zones": options.get("support_zones") or [],
+        "resistance_zones": options.get("resistance_zones") or [],
+        "signal": options.get("signal"),
+        "reason": options.get("reason") or [],
+        "warning": options.get("warning") or [],
+        "levels_count": len(options.get("levels") or []),
+    }
+
+
 def _persist_scan(db: Session, payload: ScannerPayload) -> None:
     for q in [payload.nifty, payload.banknifty]:
         db.add(
