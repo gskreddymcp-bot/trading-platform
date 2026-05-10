@@ -1,0 +1,133 @@
+# ============================================================
+# Market Intelligence OS V1 - Git Ignore
+# ============================================================
+
+# ----------------------------
+# Secrets / environment files
+# ----------------------------
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Upstox / broker credentials
+*access_token*
+*refresh_token*
+*api_secret*
+*upstox_token*
+*analytics_token*
+tokens/
+secrets/
+credentials/
+*.secret
+*.secrets
+*.key
+*.pem
+*.p12
+*.pfx
+
+# ----------------------------
+# Python
+# ----------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+backend/.venv/
+backend/venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# ----------------------------
+# Local databases
+# ----------------------------
+*.db
+*.sqlite
+*.sqlite3
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+market_intel_os_v1.db
+
+# ----------------------------
+# Logs / runtime files
+# ----------------------------
+*.log
+logs/
+*.pid
+*.tmp
+tmp/
+temp/
+.cache/
+.DS_Store
+Thumbs.db
+
+# ----------------------------
+# Scanner outputs / debug dumps
+# ----------------------------
+scan.json
+scanner_error.txt
+nifty_contracts.json
+banknifty_contracts.json
+*_contracts.json
+*_scan.json
+debug_*.json
+raw_*.json
+option_chain_*.json
+
+# ----------------------------
+# Node / frontend
+# ----------------------------
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+.npm/
+.pnpm-store/
+yarn-error.log
+npm-debug.log*
+pnpm-debug.log*
+
+# ----------------------------
+# Vite / frontend local files
+# ----------------------------
+frontend/.vite/
+frontend/.cache/
+
+# ----------------------------
+# Docker / compose local overrides
+# ----------------------------
+docker-compose.override.yml
+docker-compose.local.yml
+
+# ----------------------------
+# IDE / editor
+# ----------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.orig
+
+# ----------------------------
+# OS files
+# ----------------------------
+Desktop.ini
+ehthumbs.db
