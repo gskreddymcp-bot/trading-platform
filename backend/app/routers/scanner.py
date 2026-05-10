@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db import get_db
-from app.services.scanner_service import run_full_scan, latest_scan_from_db
+from app.services.scanner_service import (
+    run_full_scan,
+    latest_scan_from_db,
+    compact_scan_payload,
+)
 
 router = APIRouter(prefix="/api/v1/scanner", tags=["scanner"])
 
@@ -20,6 +24,23 @@ async def latest_scan(db: Session = Depends(get_db)):
         if latest is None:
             raise HTTPException(status_code=500, detail="Scanner did not persist result")
     return latest
+
+
+@router.get("/latest/compact")
+async def latest_scan_compact(db: Session = Depends(get_db)):
+    latest = latest_scan_from_db(db)
+    if latest is None:
+        await run_full_scan(db)
+        latest = latest_scan_from_db(db)
+        if latest is None:
+            raise HTTPException(status_code=500, detail="Scanner did not persist result")
+
+    payload = latest.get("payload") or {}
+    return {
+        "id": latest.get("id"),
+        "created_at": latest.get("created_at"),
+        "compact": compact_scan_payload(payload),
+    }
 
 
 @router.get("/history")
